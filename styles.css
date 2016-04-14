@@ -1,0 +1,101 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:300|Lobster);
+
+@media screen and (max-width: 415px) {
+	body { margin-top: 50px; margin-bottom: 0px; background-color: #0D4A4D; }
+	#closure { width: 100%; padding: 0px;}
+	td { height: 100px; width: 100px; }
+	table { width: 300px;}
+
+}
+
+@media screen and (min-width: 416px) {
+	body { margin-top: 50px; margin-bottom: 50px; background-color: #003133; }
+	#closure { width: 400px; padding: 10px;}
+	td { height: 127px; width: 127px; }
+	table { width: 100%;}
+}
+
+.color-secondary-1-0 { color: #236467 }	/* BLUES (1) */
+.color-secondary-1-1 { color: #67989A } /* buttons */ 
+.color-secondary-1-2 { color: #417E80 }
+.color-secondary-1-3 { color: #0D4A4D } /* closure */
+.color-secondary-1-4 { color: #003133 }
+
+.color-secondary-2-0 { color: #7A9E35 }	/* GREENS (2) */
+.color-secondary-2-1 { color: #D2ED9E }
+.color-secondary-2-2 { color: #A4C663 }
+.color-secondary-2-3 { color: #557714 }
+.color-secondary-2-4 { color: #344F00 }
+
+/* reds */
+.color-primary-1 { color: #FFACAA }
+.color-primary-0 { color: #AA3C39 }	
+.color-primary-2 { color: #D46D6A }
+.color-primary-3 { color: #801815 }
+.color-primary-4 { color: #550200 }
+
+body {
+	font-family: 'Roboto', sans-serif;
+	line-height: 10px;
+}
+
+h2 {
+	font-family: 'Lobster', cursive;
+	text-align: center;
+}
+
+#record {
+	text-align: center;
+	font-size: .9em;
+}
+
+#closure {
+	color: white;
+	background:  #0D4A4D;
+	border-radius: 5px;
+	margin: auto;
+	text-align: center;
+}
+
+table {
+	text-align: center;
+	font-size: 2.5em;
+	display: none;
+	margin: auto;
+}
+
+td {
+	background: #67989A;
+	color: white;
+}
+
+.x {
+}
+
+.o {
+}
+
+.win {
+	background: #557714;
+}
+
+.lose {
+	background: #801815;
+}
+
+.tie {
+	background: #003133;
+}
+
+#xSelect, #oSelect {
+	display: inline-block;
+}
+
+#selector {
+	text-align: center;
+	font-size: 2em;
+}
+
+#record {
+	display: none;
+}
