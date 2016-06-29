@@ -1,3 +1,5 @@
+var exports = module.exports = {};
+
 var p1 = true;
 var charP, charC; // starts blank, result of a function called on ready (after choice is made)
 var victory = false;
@@ -15,19 +17,19 @@ var combos = [['#a1', '#a2', '#a3'],
 			['#a1', '#b2', '#c3'],
 			['#c1', '#b2', '#a3']]
 
-function updateBlanks() {
+exports.updateBlanks = function() {
 	blanks = $('.blank').length;
 	return;
 }
 
-function tie() {
+exports.tie = function() {
 	$('#b2').addClass('tie').text('TIE');
 	record.ties += 1;
 	var gloat = window.setTimeout(reset, 2000);
 	return;
 }
 
-function reset() {
+exports.reset() = function() {
 	$('td').removeClass().html('').addClass('blank');
 	$('#wins').text(record.wins);
 	$('#losses').text(record.losses);
@@ -37,7 +39,7 @@ function reset() {
 	return;
 }
 
-function onWin(squares) {
+exports.onWin = function(squares) {
 	if (p1) {
 		var result = 'win';
 		record.wins += 1;
@@ -54,8 +56,8 @@ function onWin(squares) {
 	return;
 }
 
-function check() {	
-	updateBlanks();
+exports.check = function() {
+	this.updateBlanks();
 	for (i = 0; i < combos.length; i++) {
 
 		var squares;
@@ -70,7 +72,7 @@ function check() {
 		}
 
 		if (victory) {
-			onWin(squares);
+			this.onWin(squares);
 			return;
 		}
 	}
@@ -78,13 +80,13 @@ function check() {
 	return;
 }
 
-function player(element) {
+exports.player = function(element) {
 	if (charP === 'x') {
-		makeX(element)
+		this.makeX(element)
 	} else {
-		makeO(element)
+		this.makeO(element)
 	}
-	check();
+	this.check();
 
 	if (victory) {
 		return;
@@ -93,26 +95,26 @@ function player(element) {
 	p1 = false;
 
 	if (blanks === 0) {
-		tie();
+		this.tie();
 		return;
 	} else {
-		computer();
+		this.computer();
 		return;
 	}
 }
 
-function convert(squares) {
+exports.convert = function(squares) {
 	var classes = [$(squares[0]).attr('class'), $(squares[1]).attr('class'), $(squares[2]).attr('class')];
 	var value = 0;
 
 	for (j = 0; j < 3; j++) {
-		
+
 		if (classes[j] === charC) {
 			value += 100;
-		} 
+		}
 		if (classes[j] === charP) {
 			value += 10;
-		} 
+		}
 		if (classes[j] === 'blank') {
 			value += 1;
 		}
@@ -121,14 +123,14 @@ function convert(squares) {
 
 }
 
-function computer() {
-	
+exports.computer = function() {
+
 	// determine the best opportunity
 	var bestChoice;
 	var curPriority = 0;
 
 	for (i = 0; i < combos.length; i++) {
-		var value = convert(combos[i]);
+		var value = this.convert(combos[i]);
 		var priority = 0;
 		if (value === 201) {				// two charC, one blank
 			priority = 10;
@@ -159,18 +161,18 @@ function computer() {
 	} else {
 		var blanks = $('.blank');
 	}
-	
+
 	// pick one of the blank squares
 	var elementID = "#" + blanks[Math.floor(Math.random() * blanks.length)].id;
 	var element = $(elementID);
 
 	if (charC === 'x') {
-		makeX(element)
+		this.makeX(element)
 	} else {
-		makeO(element)
+		this.makeO(element)
 	}
 
-	check();
+	this.check();
 
 	if (victory) {
 		return;
@@ -179,7 +181,7 @@ function computer() {
 	p1 = true;
 }
 
-function makeX(element) {
+exports.makeX = function(element) {
 	if (element.hasClass('blank')) {
 		element.removeClass();
 		element.addClass('x');
@@ -188,7 +190,7 @@ function makeX(element) {
 	return;
 }
 
-function makeO(element) {
+exports.makeO = function(element) {
 	if (element.hasClass('blank')) {
 		element.removeClass();
 		element.addClass('o');
@@ -198,8 +200,8 @@ function makeO(element) {
 }
 
 // click handler
-function clicker() {
-	$('td').click(function(){
+exports.clicker = function() {
+	$('td').click(function() {
 		if (p1) {
 			player($(this));
 		}
@@ -207,26 +209,26 @@ function clicker() {
 	return;
 }
 
-$(document).ready(function(){
-
+exports.init = function() {
 	$('#xSelect').click(function() {
 		charP = 'x';
 		charC = 'o';
 		$('#selector').css('display', 'none')
 		$('#record').css('display', 'block')
 		$('table').css('display', 'block')
-		clicker();
-
+		this.clicker();
 	});
-	
+
 	$('#oSelect').click(function() {
 		charP = 'o';
 		charC = 'x';
 		$('#selector').css('display', 'none')
 		$('#record').css('display', 'block')
 		$('table').css('display', 'block')
-		clicker();
-
+		this.clicker();
 	});
+}
 
+$(document).ready(function(){
+	exports.init();
 });
