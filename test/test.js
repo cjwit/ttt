@@ -3,7 +3,7 @@ var expect = chai.expect;
 
 describe('makeX and makeO', function() {
     describe('makeX', function() {
-        it("should remove class 'blank' from an accepted element, add class x, and change the text to X", function() {
+        it("should remove all classes from an accepted element, add class x, and change the text to X", function() {
             var e = $('<div/>').addClass('blank').text('test');
             makeX(e);
             assert.equal(e.attr('class'), 'x');
@@ -22,7 +22,7 @@ describe('makeX and makeO', function() {
     })
 });
 
-describe('player', function() {
+describe("player's click", function() {
     it("should call makeX() when 'charP' is 'x'", function() {
         charP = 'x';
         player($('<td />'));
@@ -35,14 +35,13 @@ describe('player', function() {
         expect(spyMakeO).to.have.been.called();
     });
 
-    $('.blank').addClass('test')
-    it("should call tie() if 'blanks' == 0", function() {
+    it("should call tie() if 'blanks' == 0 and there is no winner", function() {
         $('table td').removeClass('blank');
         player($('<td />'));
         expect(spyTie).to.have.been.called();
     });
 
-    it("should call computer() if 'blanks' !== 0", function() {
+    it("should call computer() if 'blanks' !== 0 and there is no winner", function() {
         $('table td').addClass('.blank')
         player($('<td />'));
         expect(spyComputer).to.have.been.called();
@@ -63,52 +62,125 @@ describe("the computer's turn", function() {
     });
 
     describe('getCurrentOptions', function() {
-        it("should return an array of blank squares that remain within the bestChoice combo");
+        it("should return an array of blank squares that are suitable choices for the next move", function() {
+            charC = 'o';
+            charP = 'x';
+
+            // one blank
+            $('table td').removeClass().addClass('blank');
+            $('#c1').removeClass('blank').addClass('o');
+            $('#c2').removeClass('blank').addClass('o');
+            $('#b2').removeClass('blank').addClass('x');
+            var bestChoice = findBestChoice()
+            var blankTestSquares = getCurrentOptions(bestChoice);
+            assert.equal(1, blankTestSquares.length)
+            blankTestSquares.forEach(function(square) {
+                assert.equal(true, $(square).hasClass('blank'))
+            })
+
+            $('table td').removeClass().addClass('blank');
+            $('#a1').removeClass('blank').addClass('o');
+            $('#a2').removeClass('blank').addClass('x');
+            var bestChoice = findBestChoice()
+            var blankTestSquares = getCurrentOptions(bestChoice);
+            assert.equal(4, blankTestSquares.length)
+            blankTestSquares.forEach(function(square) {
+                assert.equal(true, $(square).hasClass('blank'))
+            })
+        });
+
+        it('should return an array of all empty squares if there are no clear best options', function() {
+            charC = 'o';
+            charP = 'x';
+
+            $('table td').removeClass().addClass('blank');
+            $('#a2').removeClass('blank').addClass('x');
+            var bestChoice = findBestChoice()
+            var blankTestSquares = getCurrentOptions(bestChoice);
+            assert.equal(8, blankTestSquares.length)
+            blankTestSquares.forEach(function(square) {
+                assert.equal(true, $(square).hasClass('blank'))
+            })
+        })
     });
 });
 
-describe('login following each square selection', function() {
-    describe('check', function() {
-        it("should check each potential combination for three consecutive Xs or Os");
-        it("should pass the winning set of squares to onWin if one exists");
-    });
+describe('following each square selection', function() {
+    describe('checkForWin', function() {
+        victory = false;
+        it("should check each potential combination for three consecutive Xs or Os", function() {
 
-    describe('updateBlanks', function() {
-        it("should increment the lenght of 'blanks' after each click");
+            // if no win
+            $('table td').removeClass().addClass('blank');
+            $('#a1').removeClass('blank').addClass('o');
+            $('#a2').removeClass('blank').addClass('x');
+            $('#b2').removeClass('blank').addClass('o');
+            $('#c2').removeClass('blank').addClass('x');
+            checkForWin();
+            assert.equal(false, victory);
+
+            // if there is a win
+            $('table td').removeClass().addClass('blank');
+            $('#a1').removeClass('blank').addClass('o');
+            $('#a2').removeClass('blank').addClass('x');
+            $('#b2').removeClass('blank').addClass('x');
+            $('#c2').removeClass('blank').addClass('x');
+            checkForWin();
+            assert.equal(true, victory);
+        });
+
+        it("should pass the winning set of squares to onWin if one exists", function() {
+            charC = 'o';
+            charP = 'x';
+            victory = false;
+
+            $('table td').removeClass().addClass('blank');
+            $('#a1').removeClass('blank').addClass('o');
+            $('#a2').removeClass('blank').addClass('x');
+            $('#b2').removeClass('blank').addClass('x');
+            $('#c2').removeClass('blank').addClass('x');
+            checkForWin();
+            expect(spyOnWin).to.have.been.called();
+        });
     });
 });
 
-describe('onWin', function() {
-    describe("if it is player 1's turn", function() {
-        p1 = true;
-        var squares = [$('<div/>'),$('<div/>'),$('<div/>')]
-        onWin(squares);
+describe('the end of the game', function() {
+    describe('onWin', function() {
+        describe("if it is player 1's turn", function() {
+            var squares = ['#a1','#a2', '#a3']
 
-        it("should increment wins", function() {
-            assert.equal(1, record.wins);
+            it("should increment wins", function() {
+                p1 = true;
+                var currentWins = record.wins;
+                currentWins += 1;
+                onWin(squares);
+                assert.equal(currentWins, record.wins);
+            });
+            it("should add class 'win' to squares", function() {
+                assert.equal($(squares[0]).hasClass('win'), true);
+                assert.equal($(squares[1]).hasClass('win'), true);
+                assert.equal($(squares[2]).hasClass('win'), true);
+            });
         });
-        it("should add class 'win' to squares", function() {
-            assert.equal($(squares[0]).hasClass('win'), true);
-            assert.equal($(squares[1]).hasClass('win'), true);
-            assert.equal($(squares[2]).hasClass('win'), true);
+
+        describe("if it is the computer's turn", function() {
+            var squares = ['#a1','#a2', '#a3']
+            it("should increment losses", function() {
+                p1 = false;
+                var currentLosses = record.losses;
+                currentLosses += 1;
+                onWin(squares);
+                assert.equal(currentLosses, record.losses);
+            });
+            it("should add class 'lose' to squares", function() {
+                assert.equal($(squares[0]).hasClass('lose'), true);
+                assert.equal($(squares[1]).hasClass('lose'), true);
+                assert.equal($(squares[2]).hasClass('lose'), true);
+            });
         });
     });
-
-    describe("if it is the computer's turn", function() {
-        p1 = false;
-        var squares = [$('<div/>'),$('<div/>'),$('<div/>')]
-        onWin(squares);
-
-        it("should increment losses", function() {
-            assert.equal(1, record.losses);
-        });
-        it("should add class 'lose' to squares", function() {
-            assert.equal($(squares[0]).hasClass('lose'), true);
-            assert.equal($(squares[1]).hasClass('lose'), true);
-            assert.equal($(squares[2]).hasClass('lose'), true);
-        });
-    });
-
+    
     describe('tie', function() {
         it('should increment ties', function() {
             var currentTies = record.ties;

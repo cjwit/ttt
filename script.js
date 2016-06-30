@@ -37,11 +37,12 @@ var reset = function() {
 }
 
 var onWin = function(squares) {
+	var result;
 	if (p1) {
-		var result = 'win';
+		result = 'win';
 		record.wins += 1;
 	} else {
-		var result = 'lose';
+		result = 'lose';
 		record.losses += 1;
 	}
 
@@ -54,10 +55,8 @@ var onWin = function(squares) {
 }
 
 var checkForWin = function() {
+	var squares;
 	for (i = 0; i < combos.length; i++) {
-
-		var squares;
-
 		if ($(combos[i][0]).hasClass('x') && $(combos[i][1]).hasClass('x') && $(combos[i][2]).hasClass('x')) {
 			squares = combos[i];
 			victory = true;
@@ -68,8 +67,8 @@ var checkForWin = function() {
 		}
 
 		if (victory) {
-			onWin(squares);
-			return;
+			spyOnWin(squares);
+			break;
 		}
 	}
 
@@ -122,7 +121,7 @@ var convert = function(squares) {
 
 var findBestChoice = function() {
 	// determine the best opportunity
-	var bestChoice;
+	var bestChoice = [];
 	var curPriority = 0;
 
 	for (i = 0; i < combos.length; i++) {
@@ -137,40 +136,37 @@ var findBestChoice = function() {
 		}
 
 		if (priority > curPriority) {
-			bestChoice = i;
+			bestChoice = [i];
 			curPriority = priority;
+		} else if (priority === curPriority) {
+			bestChoice.push(i);
 		}
 	}
 	return bestChoice;
 }
 
 var getCurrentOptions = function(bestChoice) {
-	var blanksSquares = [];
+	var blankSquares = [];
 
-	// find blanks within the best row choice
-	if (bestChoice >= 0) {
-		var row = [combos[bestChoice][0], combos[bestChoice][1], combos[bestChoice][2]];
-		for (i = 0; i < 3; i++) {
-			if ($(row[i]).hasClass('blank')) {
-				blanksSquares.push(document.getElementById(row[i].substr(1)));
+	// find blanks within the best row choices
+	bestChoice.map(function(choice) {
+		var row = [combos[choice][0], combos[choice][1], combos[choice][2]];
+		row.forEach(function(id) {
+			if ($(id).hasClass('blank') && blankSquares.indexOf(id) === -1) {
+				blankSquares.push(id);
 			}
-		}
-
-	// there is no best row, blanks are all remaining on the board
-	} else {
-		var blanksSquares = $('.blank');
-	}
-	return blanksSquares;
+		});
+	});
+	return blankSquares;
 }
 
 var computer = function() {
 	var bestChoice = findBestChoice();
-	var blanksSquares = getCurrentOptions(bestChoice);
+	var blankSquares = getCurrentOptions(bestChoice);
 
 	// pick one of the blank squares
-	var elementID = "#" + blanksSquares[Math.floor(Math.random() * blanksSquares.length)].id;
+	var elementID = blankSquares[Math.floor(Math.random() * blankSquares.length)];
 	var element = $(elementID);
-
 	if (charC === 'x') {
 		makeX(element)
 	} else {
@@ -237,6 +233,7 @@ var spyMakeX = chai.spy(makeX);
 var spyMakeO = chai.spy(makeO);
 var spyTie = chai.spy(tie);
 var spyComputer = chai.spy(computer);
+var spyOnWin = chai.spy(onWin);
 
 $(document).ready(function(){
 	init();
